@@ -40,3 +40,29 @@ jobs:
         run: |
           pip install pytest
           pytest test.py
+
+          
+  
+  deploy:
+    needs: 
+      - build
+      - test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.x'
+      - name: Deploy Docker container
+        run: |
+          docker pull $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
+          docker run -d -p 80:80 $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
+      - name: Notify on failure
+        if: failure()
+        run: |
+          # Add code to send alerts (e.g., to Slack or email)
+          # Example: Send a Slack notification
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"Deployment failed!"}' $SLACK_WEBHOOK_URL
+        
