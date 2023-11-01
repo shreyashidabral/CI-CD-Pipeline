@@ -56,9 +56,12 @@ jobs:
         with:
           python-version: '3.x'
       - name: Deploy Docker container
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          IMAGE_NAME: ci-cd-pipeline-image
         run: |
           docker pull $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
-          docker run -d -p 80:80 $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
+          docker run -d -p 8080:8080 $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
       - name: Notify on failure
         if: failure()
         run: |
